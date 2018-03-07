@@ -11,12 +11,14 @@
     "ascii-progress": "^1.0.5",
     "datauri": "^1.1.0",
     "download-file-sync": "^1.0.4",
+    "node-id3": "^0.1.3",
     "request-progress": "^3.0.0",
     "request-promise": "^4.2.2",
     "sanitize-filename": "^1.6.1"
   },
   "scripts": {
     "start": "node index.js",
+    "id3": "node id3.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -4,6 +4,7 @@ const request = require('request-promise'),
     fs = require('fs'),
     sanitize = require('sanitize-filename'),
     ProgressBar = require('ascii-progress'),
+    NodeID3 = require('node-id3'),
     URL = require('url'),
     downloadFileSync = require('download-file-sync');
 
@@ -40,6 +41,33 @@ function buildContext({url, destinationFolder}) {
             }
         },
 
+        updateID3Tags(fullFileName, entry) {
+            const tags = {
+                album: entry['emission-title'],
+                title: entry['diffusion-title'],
+                artist: entry['author'],
+                year: new Date(entry['start-time'] * 1000).toISOString().substring(0, 4),
+                length: new Date((entry['end-time'] - entry['start-time']) * 1000).toISOString().substring(11, 19),
+                copyright: 'Radio France',
+                genre: '(186)', // PODCAST
+                comment: {
+                    language: '',
+                    shortText: '',
+                    text: entry['diffusion-path']
+                },
+                /* TODO
+                image: {
+                    mime: 'jpeg',
+                    type: { id: 3, name: 'front cover' },
+                    description: undefined,
+                    imageBuffer: <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 02 00 00 64 00 64 00 00 ff ec 00 11 44 75 63 6b 79 00 01 00 04 00 00 00 64 0000 ff ee 00 0e 41 64 6f 62 65 00 64 ... > 
+                }
+                */
+            };
+
+            NodeID3.write(tags, fullFileName);
+        },
+
         download(entry, cb) {
             const dateString = new Date(entry['start-time'] * 1000).toISOString().substring(0, 10),
                 name = sanitize(entry['diffusion-title']),
@@ -63,6 +91,7 @@ function buildContext({url, destinationFolder}) {
                         .on('end', () => {
                             writefileStream.end();
                             progressBar.update(100, {statut: ', terminé'});
+                            this.updateID3Tags(fullFileName, entry);
                         })
                         .on('error', err => {
                             writefileStream.end();
@@ -96,7 +125,7 @@ function buildContext({url, destinationFolder}) {
                 downloadEntries.push(downloadEntry.build());
             });
             
-            return downloadEntries[0];
+            return [downloadEntries[0]];
         },
 
         buildDownloadPage(uri, queryParams) {
