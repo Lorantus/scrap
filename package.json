@@ -9,6 +9,9 @@
   },
   "devDependencies": {
     "ascii-progress": "^1.0.5",
+    "commander": "^2.15.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "datauri": "^1.1.0",
     "download-file-sync": "^1.0.4",
     "node-id3": "^0.1.3",
@@ -17,11 +20,18 @@
     "sanitize-filename": "^1.6.1"
   },
   "scripts": {
-    "start": "node index.js",
-    "id3": "node id3.js",
+    "start": "babel-node index.js -- ",
+    "id3": "babel-node id3.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "babel": {
+    "presets": [
+      "env"
+    ],
+    "sourceMaps": true,
+    "retainLines": true
+  }
 }
